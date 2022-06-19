@@ -2,8 +2,8 @@ local ToggleKey
 
 JM36.CreateThread(function()
 	
-	local SetControlNormal, math_min, math_abs, GetEntitySpeedVector, IsControlJustPressed
-		= SetControlNormal, math.min, math.abs, GetEntitySpeedVector, IsControlJustPressed
+	local SetControlNormal, math_min, math_abs, GetEntitySpeedVector, IsControlPressed, IsControlJustPressed
+		= SetControlNormal, math.min, math.abs, GetEntitySpeedVector, IsControlPressed, IsControlJustPressed
 	
 	local VehicleEligible, CruiseControlSpeed, LastVehicle
 	
@@ -20,7 +20,7 @@ JM36.CreateThread(function()
 		end
 		
 		if VehicleEligible and Vehicle.IsIn and Vehicle.IsOp then
-			if IsControlJustPressed(0, ToggleKey) then
+			if IsControlJustPressed(0, ToggleKey) and (ToggleKey ~= 73 or not IsControlPressed(27, 68)) then
 				CruiseControlSpeed = not CruiseControlSpeed and GetEntitySpeedVector(LastVehicle, true).y
 			end
 			if CruiseControlSpeed then
