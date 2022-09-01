@@ -64,11 +64,25 @@ JM36.CreateThread(function()
 end)
 
 JM36.CreateThread(function()
-	local SetControlNormal, math_min, IsControlPressed, IsControlJustPressed
-		= SetControlNormal, math.min, IsControlPressed, IsControlJustPressed
+	local SetControlNormal, math_min
+		= SetControlNormal, math.min
+	
+	local ControlJustPressed = coroutine.wrap(function()
+		local IsUsingKeyboard, IsControlJustPressed, IsControlPressed
+			= IsUsingKeyboard, IsControlJustPressed, IsControlPressed
 		
-	local ToggleKey = tonumber(configFileRead("VehicleCruiseControl.ini").ToggleKey or 73) or 73
-	local NotUsingDefault = ToggleKey ~= 73
+		local ToggleKey = tonumber(configFileRead("Vehicle_CruiseControl_Traditional.ini").ToggleKey or 73) or 73
+		local NotUsingDefault = ToggleKey ~= 73
+		local coroutine_yield = coroutine.yield
+		while true do
+			if not IsUsingKeyboard(2) then
+				coroutine_yield(IsControlJustPressed(2, ToggleKey) and not (NotUsingDefault or IsControlPressed(27, 68)))
+			else
+				coroutine_yield(IsControlJustPressed(2, ToggleKey))
+			end
+		end
+	end)
+	
 	local VehicleEligible, LastVehicle
 	while true do
 		if Vehicle.IsIn then
@@ -85,7 +99,7 @@ JM36.CreateThread(function()
 			end
 			
 			if VehicleEligible and Vehicle.IsOp then
-				if IsControlJustPressed(0, ToggleKey) and not (NotUsingDefault or IsControlPressed(27, 68)) then
+				if ControlJustPressed() then
 					CruiseControlSpeed = not CruiseControlSpeed and GetEntitySpeedVector(LastVehicle, true).y
 				end
 				if CruiseControlSpeed then
